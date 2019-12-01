@@ -28,23 +28,23 @@ const Game: React.FC = () => {
   const [hits, setHits] = React.useState(0);
 
   const [players, setPlayers] = React.useState({
-    // asdf: {
+    // a: {
     //   name: "a",
     //   hits: [5, 3, 2, 1]
     // },
-    // qwer: {
+    // q: {
     //   name: "q",
     //   hits: [5, 1, 2, 1]
     // },
-    // sdfg: {
+    // s: {
     //   name: "s",
     //   hits: [5, 11, 2, 1]
     // },
-    // erty: {
+    // e: {
     //   name: "e",
     //   hits: [6, 5, 2, 1]
     // },
-    // tyui: {
+    // t: {
     //   name: "t",
     //   hits: [5, 333, 2, 5]
     // }
@@ -71,18 +71,27 @@ const Game: React.FC = () => {
   };
 
   const _sortPlayers = (curr:any, prev:any) => {
-    let currHitsStr = curr.hits.toString();
-    let prevHitsStr = prev.hits.toString();
+    let currHits = curr.hits;
+    let prevHits = prev.hits;
+    let q = Math.max(
+      currHits.length,
+      prevHits.length
+    );
 
-    return currHitsStr < prevHitsStr ? 1 : currHitsStr > prevHitsStr ? -1 : 0;
+    for (let i = 0; i < q; i++) {
+      if (currHits[i] < prevHits[i]) return 1;
+      if (currHits[i] > prevHits[i]) return -1;
+    }
+
+    return 0;
   };
 
   React.useEffect(() => {
     console.log("Misses", misses);
-    if (misses === sets[level]) {
+    if (misses >= sets[level]) {
       _handleScore();
     }
-  }, [misses]);
+  }, [misses, level]);
 
   const playersDisplay = !!Object.keys(players).length && (
     <IonCard>
@@ -96,11 +105,14 @@ const Game: React.FC = () => {
           .map((player:any, index) => (
             <IonItem key={index}>
               <IonLabel>
-                {index + 1} {player.name}
+                <IonNote style={{ marginRight: "0.5rem" }}>
+                  {index + 1}
+                </IonNote>
+                {player.name}
               </IonLabel>
               <IonNote slot="end">
-                {player.hits.map((hit:any) => (
-                  <IonBadge color="primary" style={{ marginLeft: "0.5rem" }}>
+                {player.hits.map((hit:any, i:number) => (
+                  <IonBadge key={i} color="primary" style={{ marginLeft: "0.5rem" }}>
                     {hit}
                   </IonBadge>
                 ))}
@@ -122,12 +134,12 @@ const Game: React.FC = () => {
         {playersDisplay}
         <IonGrid className="ion-padding">
           <IonRow>
-            <IonCol style={{ textAlign: "center" }}>
+            <IonCol className="ion-text-center">
               <IonTitle>{sets[level]} misses allowed</IonTitle>
             </IonCol>
           </IonRow>
           <IonRow>
-            <IonCol style={{ textAlign: "center" }}>
+            <IonCol className="ion-text-center">
               <IonButton color="warning" onClick={() => setLevel(level + 1)}>
                 Level up ({level + 1})
               </IonButton>

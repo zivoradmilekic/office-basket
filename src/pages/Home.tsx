@@ -24,14 +24,14 @@ const Home: React.FC = () => {
       <IonContent>
         <IonGrid className="ion-padding">
           <IonRow>
-            <IonCol style={{ textAlign: "center" }}>
+            <IonCol className="ion-text-center">
               <IonText>
                 Have a fun! Take a break of your hard work!
               </IonText>
             </IonCol>
           </IonRow>
           <IonRow>
-            <IonCol style={{ textAlign: "center" }}>
+            <IonCol className="ion-text-center">
               <IonButton routerLink="/game">
                 Play new game
               </IonButton>
