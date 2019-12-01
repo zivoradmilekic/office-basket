@@ -1,5 +1,7 @@
 import React from 'react';
 
+import useLocalStorage from '../useLocalStorage';
+
 import {
   IonButton,
   IonGrid,
@@ -19,53 +21,36 @@ import {
   IonHeader,
   IonToolbar,
   IonTitle,
-  IonBadge
+  IonBadge,
+  IonActionSheet
 } from '@ionic/react';
 
 const Game: React.FC = () => {
+  const [players, setPlayers] = useLocalStorage('players', {});
   const [level, setLevel] = React.useState(0);
   const [misses, setMisses] = React.useState(0);
   const [hits, setHits] = React.useState(0);
+  const [showActionSheet, setShowActionSheet] = React.useState(false);
 
-  const [players, setPlayers] = React.useState({
-    // a: {
-    //   name: "a",
-    //   hits: [5, 3, 2, 1]
-    // },
-    // q: {
-    //   name: "q",
-    //   hits: [5, 1, 2, 1]
-    // },
-    // s: {
-    //   name: "s",
-    //   hits: [5, 11, 2, 1]
-    // },
-    // e: {
-    //   name: "e",
-    //   hits: [6, 5, 2, 1]
-    // },
-    // t: {
-    //   name: "t",
-    //   hits: [5, 333, 2, 5]
-    // }
-  });
+  const [game, setGame] = React.useState(players);
 
   const sets = [10, 5, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
-  const _handleScore = () => {
-    const name:any = prompt(`Game over! Enter player name`);
-    let newPlayers:any = {
-      ...players
+  const _handleScore = (name:any) => {
+    let newGame:any = {
+      ...game
     };
 
-    let oldHits = !!newPlayers[name] ? newPlayers[name].hits : [];
+    let oldHits = (!!newGame[name] && !!newGame[name].hits)
+      ? newGame[name].hits
+      : [];
 
-    newPlayers[name] = {
+    newGame[name] = {
       name,
       hits: [...oldHits, hits]
     };
 
-    setPlayers(newPlayers);
+    setGame(newGame);
     setMisses(0);
     setHits(0);
   };
@@ -73,6 +58,8 @@ const Game: React.FC = () => {
   const _sortPlayers = (curr:any, prev:any) => {
     let currHits = curr.hits;
     let prevHits = prev.hits;
+    if (!currHits || !prevHits) return 0;
+
     let q = Math.max(
       currHits.length,
       prevHits.length
@@ -89,18 +76,18 @@ const Game: React.FC = () => {
   React.useEffect(() => {
     console.log("Misses", misses);
     if (misses >= sets[level]) {
-      _handleScore();
+      setShowActionSheet(true);
     }
   }, [misses, level]);
 
-  const playersDisplay = !!Object.keys(players).length && (
+  const gameDisplay = !!Object.keys(game).length && (
     <IonCard>
       <IonCardHeader>
         <IonCardSubtitle>Scoreboard</IonCardSubtitle>
         <IonCardTitle>Players</IonCardTitle>
       </IonCardHeader>
       <IonList inset={true} lines={"full"}>
-        {Object.values(players)
+        {Object.values(game)
           .sort((a, b) => _sortPlayers(a, b))
           .map((player:any, index) => (
             <IonItem key={index}>
@@ -111,7 +98,7 @@ const Game: React.FC = () => {
                 {player.name}
               </IonLabel>
               <IonNote slot="end">
-                {player.hits.map((hit:any, i:number) => (
+                {!!player.hits && player.hits.map((hit:any, i:number) => (
                   <IonBadge key={i} color="primary" style={{ marginLeft: "0.5rem" }}>
                     {hit}
                   </IonBadge>
@@ -131,7 +118,7 @@ const Game: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent scrollEvents={true}>
-        {playersDisplay}
+        {gameDisplay}
         <IonGrid className="ion-padding">
           <IonRow>
             <IonCol className="ion-text-center">
@@ -148,31 +135,45 @@ const Game: React.FC = () => {
         </IonGrid>
       </IonContent>
       <IonFooter>
-        <IonGrid>
-          <IonRow>
-            <IonCol style={{ textAlign: "center" }}>
-              <IonNote>{misses}</IonNote>
-              <IonButton
-                color="danger"
-                expand="block"
-                onClick={() => setMisses(misses + 1)}
-              >
-                Miss
-              </IonButton>
-            </IonCol>
-            <IonCol style={{ textAlign: "center" }}>
-              <IonNote>{hits}</IonNote>
-              <IonButton
-                color="success"
-                expand="block"
-                onClick={() => setHits(hits + 1)}
-              >
-                Hit
-              </IonButton>
-            </IonCol>
-          </IonRow>
-        </IonGrid>
+        <IonToolbar>
+          <IonGrid>
+            <IonRow>
+              <IonCol style={{ textAlign: "center" }}>
+                <IonNote>{misses}</IonNote>
+                <IonButton
+                  color="danger"
+                  expand="block"
+                  onClick={() => setMisses(misses + 1)}
+                >
+                  Miss
+                </IonButton>
+              </IonCol>
+              <IonCol style={{ textAlign: "center" }}>
+                <IonNote>{hits}</IonNote>
+                <IonButton
+                  color="success"
+                  expand="block"
+                  onClick={() => setHits(hits + 1)}
+                >
+                  Hit
+                </IonButton>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </IonToolbar>
       </IonFooter>
+      <IonActionSheet
+        isOpen={showActionSheet}
+        backdropDismiss={false}
+        onDidDismiss={() => setShowActionSheet(false)}
+        buttons={Object.values(players).map((player:any) => {
+          return {
+            text: player.name,
+            handler: () => _handleScore(player.name)
+          }
+        })}
+      >
+      </IonActionSheet>
     </IonPage>
   );
 }
