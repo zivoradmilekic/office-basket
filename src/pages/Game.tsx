@@ -56,6 +56,21 @@ const Game: React.FC = () => {
     setHits(0);
   };
 
+  const _handleFinishGame = () => {
+    let currentPlayers: any = {...players};
+    const points: number[] = [3, 2, 1];
+
+    Object.values(game)
+      .sort((a, b) => _sortPlayers(a, b))
+      .splice(0, 3)
+      .map((player:any, index) => {
+        currentPlayers[player.name].score += points[index];
+      });
+
+    setPlayers(currentPlayers);
+    window.history.back();
+  }
+
   const _sortPlayers = (curr:any, prev:any) => {
     let currHits = curr.hits;
     let prevHits = prev.hits;
@@ -123,6 +138,13 @@ const Game: React.FC = () => {
         <IonCol className="ion-text-center">
           <IonButton color="warning" onClick={() => setLevel(level + 1)}>
             Level up ({level + 1})
+          </IonButton>
+        </IonCol>
+      </IonRow>
+      <IonRow>
+        <IonCol className="ion-text-center">
+          <IonButton color="success" onClick={() => _handleFinishGame()}>
+            Finish game
           </IonButton>
         </IonCol>
       </IonRow>
