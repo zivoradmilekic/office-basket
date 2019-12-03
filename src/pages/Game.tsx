@@ -181,7 +181,7 @@ const Game: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar color="dark">
           <IonTitle>Game</IonTitle>
         </IonToolbar>
       </IonHeader>

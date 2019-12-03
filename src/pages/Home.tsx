@@ -128,7 +128,7 @@ const Home: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar color="dark">
           <IonTitle>Office Basket</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={() => setPlayers({})}>
