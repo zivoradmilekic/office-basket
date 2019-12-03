@@ -50,7 +50,9 @@ const Home: React.FC = () => {
   const _sortPlayers = (curr:any, prev:any) => {
     let currScore = curr.score;
     let prevScore = prev.score;
-    if (!currScore || !prevScore) return 0;
+
+    if (!currScore) return 1;
+    if (!prevScore) return -1;
 
     if (currScore < prevScore) return 1;
     if (currScore > prevScore) return -1;
