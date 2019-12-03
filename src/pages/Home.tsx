@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { addCircleOutline, sync } from "ionicons/icons";
+import { addCircleOutline, flame } from "ionicons/icons";
 
 import useLocalStorage from '../hooks/useLocalStorage';
 
@@ -132,7 +132,7 @@ const Home: React.FC = () => {
           <IonTitle>Office Basket</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={() => setPlayers({})}>
-              <IonIcon slot="icon-only" icon={sync} />
+              <IonIcon slot="icon-only" icon={flame} />
             </IonButton>
           </IonButtons>
         </IonToolbar>
