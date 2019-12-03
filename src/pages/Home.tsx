@@ -1,6 +1,8 @@
 import React from 'react';
 
-import useLocalStorage from '../useLocalStorage';
+import { addCircleOutline, sync } from "ionicons/icons";
+
+import useLocalStorage from '../hooks/useLocalStorage';
 
 import {
   IonContent,
@@ -56,15 +58,15 @@ const Home: React.FC = () => {
     return 0;
   };
 
-  const playersDisplay = !!Object.keys(players).length && (
+  const playersSection = (
     <IonCard>
       <IonCardHeader>
         <IonToolbar>
-          <IonCardSubtitle>Scoreboard</IonCardSubtitle>
-          <IonCardTitle>Players</IonCardTitle>
+          <IonCardSubtitle>Players</IonCardSubtitle>
+          <IonCardTitle>Scoreboard</IonCardTitle>
           <IonButtons slot="end">
             <IonButton onClick={() => _handleAddPlayer()}>
-              <IonIcon slot="icon-only" name="search" />
+              <IonIcon slot="icon-only" icon={addCircleOutline} />
             </IonButton>
           </IonButtons>
         </IonToolbar>
@@ -89,9 +91,37 @@ const Home: React.FC = () => {
               </IonNote>
             </IonItem>
           ))}
+          {
+            !Object.keys(players).length && (
+              <IonItem>
+                <IonLabel>
+                  No players
+                </IonLabel>
+              </IonItem>
+            )
+          }
       </IonList>
     </IonCard>
   );
+
+  const playButtonSection = !!Object.keys(players).length && (
+    <IonGrid className="ion-padding">
+      <IonRow>
+        <IonCol className="ion-text-center">
+          <IonText>
+            Have a fun! Take a break of your hard work!
+          </IonText>
+        </IonCol>
+      </IonRow>
+      <IonRow>
+        <IonCol className="ion-text-center">
+          <IonButton routerLink="/game">
+            Play new game
+          </IonButton>
+        </IonCol>
+      </IonRow>
+    </IonGrid>
+  )
 
   return (
     <IonPage>
@@ -100,32 +130,14 @@ const Home: React.FC = () => {
           <IonTitle>Office Basket</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={() => setPlayers({})}>
-              <IonIcon slot="icon-only" name="search" />
-            </IonButton>
-            <IonButton onClick={() => _handleAddPlayer()}>
-              <IonIcon slot="icon-only" name="search" />
+              <IonIcon slot="icon-only" icon={sync} />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        {playersDisplay}
-        <IonGrid className="ion-padding">
-          <IonRow>
-            <IonCol className="ion-text-center">
-              <IonText>
-                Have a fun! Take a break of your hard work!
-              </IonText>
-            </IonCol>
-          </IonRow>
-          <IonRow>
-            <IonCol className="ion-text-center">
-              <IonButton routerLink="/game">
-                Play new game
-              </IonButton>
-            </IonCol>
-          </IonRow>
-        </IonGrid>
+        {playersSection}
+        {playButtonSection}
       </IonContent>
     </IonPage>
   );
