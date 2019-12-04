@@ -1,6 +1,6 @@
 import React from 'react';
 
-import useLocalStorage from '../hooks/useLocalStorage';
+import { closeCircleOutline } from "ionicons/icons";
 
 import {
   IonButton,
@@ -17,23 +17,31 @@ import {
   IonCardSubtitle,
   IonCardTitle,
   IonNote,
-  IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonBadge,
   IonActionSheet,
-  IonText
+  IonText,
+  IonButtons,
+  IonIcon
 } from '@ionic/react';
 
-const Game: React.FC = () => {
-  const [players, setPlayers] = useLocalStorage('players', {});
+interface GameProps {
+  players: any
+  onFinish: any
+  onDismiss: any
+}
+
+const Game: React.FC<GameProps> = (props) => {
   const [level, setLevel] = React.useState(0);
+
   const [misses, setMisses] = React.useState(0);
   const [hits, setHits] = React.useState(0);
-  const [showActionSheet, setShowActionSheet] = React.useState(false);
+  
+  const [game, setGame] = React.useState(props.players);
 
-  const [game, setGame] = React.useState(players);
+  const [showActionSheet, setShowActionSheet] = React.useState(false);
 
   const sets = [10, 5, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
@@ -57,7 +65,7 @@ const Game: React.FC = () => {
   };
 
   const _handleFinishGame = () => {
-    let currentPlayers: any = {...players};
+    let currentPlayers: any = {...props.players};
     const points: number[] = [3, 2, 1];
 
     Object.values(game)
@@ -67,8 +75,7 @@ const Game: React.FC = () => {
         currentPlayers[player.name].score += points[index];
       });
 
-    setPlayers(currentPlayers);
-    window.history.back();
+    props.onFinish(currentPlayers);
   }
 
   const _sortPlayers = (curr:any, prev:any) => {
@@ -96,6 +103,10 @@ const Game: React.FC = () => {
       setShowActionSheet(true);
     }
   }, [misses, level]);
+
+  React.useEffect(() => {
+    setGame(props.players)
+  }, [props.players]);
 
   const gameSection = !!Object.keys(game).length && (
     <IonCard>
@@ -179,10 +190,15 @@ const Game: React.FC = () => {
   );
 
   return (
-    <IonPage>
+    <>
       <IonHeader>
         <IonToolbar color="dark">
           <IonTitle>Game</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={() => props.onDismiss()}>
+              <IonIcon slot="icon-only" icon={closeCircleOutline} />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent scrollEvents={true}>
@@ -199,7 +215,7 @@ const Game: React.FC = () => {
         header="Choose a player"
         backdropDismiss={false}
         onDidDismiss={() => setShowActionSheet(false)}
-        buttons={Object.values(players).map((player:any) => {
+        buttons={Object.values(props.players).map((player:any) => {
           return {
             text: player.name,
             handler: () => _handleScore(player.name)
@@ -207,7 +223,7 @@ const Game: React.FC = () => {
         })}
       >
       </IonActionSheet>
-    </IonPage>
+    </>
   );
 }
 

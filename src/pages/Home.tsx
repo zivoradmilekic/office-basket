@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Game from '../modals/Game';
+
 import { addCircleOutline, flame } from "ionicons/icons";
 
 import useLocalStorage from '../hooks/useLocalStorage';
@@ -25,11 +27,13 @@ import {
   IonNote,
   IonBadge,
   IonButtons,
-  IonIcon
+  IonIcon,
+  IonModal
 } from '@ionic/react';
 
 const Home: React.FC = () => {
   const [players, setPlayers] = useLocalStorage('players', {});
+  const [showModal, setShowModal] = React.useState(false);
 
   const _handleAddPlayer = () => {
     const name:any = prompt(`Enter player name`);
@@ -46,6 +50,11 @@ const Home: React.FC = () => {
 
     setPlayers(newPlayers);
   };
+
+  const _handleFinishGame = (newPlayers: any) => {
+    setShowModal(false);
+    setPlayers(newPlayers);
+  }
 
   const _sortPlayers = (curr:any, prev:any) => {
     let currScore = curr.score;
@@ -117,7 +126,7 @@ const Home: React.FC = () => {
       </IonRow>
       <IonRow>
         <IonCol className="ion-text-center">
-          <IonButton routerLink="/game">
+          <IonButton onClick={() => setShowModal(true)}>
             Play new game
           </IonButton>
         </IonCol>
@@ -140,6 +149,17 @@ const Home: React.FC = () => {
       <IonContent>
         {playersSection}
         {playButtonSection}
+        <IonModal
+          isOpen={showModal}
+          onDidDismiss={() => setShowModal(false)}
+        >
+          <Game
+            players={players}
+            onFinish={(p:any) => _handleFinishGame(p)}
+            onDismiss={() => setShowModal(false)}
+          >
+          </Game>
+        </IonModal>
       </IonContent>
     </IonPage>
   );
