@@ -1,30 +1,20 @@
 import React from 'react';
 
-import { closeCircleOutline } from "ionicons/icons";
+import GameHeader from "../components/GameHeader";
+import Controls from "../components/Controls";
+import Levels from "../components/Levels";
+import Player from "../components/Player";
 
 import {
-  IonButton,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonContent,
   IonFooter,
   IonList,
-  IonLabel,
-  IonItem,
   IonCard,
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
-  IonNote,
-  IonHeader,
   IonToolbar,
-  IonTitle,
-  IonBadge,
-  IonActionSheet,
-  IonText,
-  IonButtons,
-  IonIcon
+  IonActionSheet
 } from '@ionic/react';
 
 interface GameProps {
@@ -34,19 +24,21 @@ interface GameProps {
 }
 
 const Game: React.FC<GameProps> = (props) => {
+  const { players, onFinish, onDismiss } = props;
+
   const [level, setLevel] = React.useState(0);
 
   const [misses, setMisses] = React.useState(0);
   const [hits, setHits] = React.useState(0);
-  
-  const [game, setGame] = React.useState(props.players);
+
+  const [game, setGame] = React.useState(players);
 
   const [showActionSheet, setShowActionSheet] = React.useState(false);
 
-  const sets = [10, 5, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+  const sets = [10, 5, 3];
 
-  const _handleScore = (name:any) => {
-    let newGame:any = {
+  const _handleScore = (name: any) => {
+    let newGame: any = {
       ...game
     };
 
@@ -65,20 +57,20 @@ const Game: React.FC<GameProps> = (props) => {
   };
 
   const _handleFinishGame = () => {
-    let currentPlayers: any = {...props.players};
+    let currentPlayers: any = { ...players };
     const points: number[] = [3, 2, 1];
 
     Object.values(game)
       .sort((a, b) => _sortPlayers(a, b))
       .splice(0, 3)
-      .map((player:any, index) => {
-        currentPlayers[player.name].score += points[index];
+      .map((player: any, index) => {
+        return currentPlayers[player.name].score += points[index];
       });
 
-    props.onFinish(currentPlayers);
+    onFinish(currentPlayers);
   }
 
-  const _sortPlayers = (curr:any, prev:any) => {
+  const _sortPlayers = (curr: any, prev: any) => {
     let currHits = curr.hits;
     let prevHits = prev.hits;
 
@@ -99,14 +91,18 @@ const Game: React.FC<GameProps> = (props) => {
   };
 
   React.useEffect(() => {
-    if (misses >= sets[level]) {
+    let setsNum = sets[level]
+    if (level >= 3) {
+      setsNum = 1;
+    }
+    if (misses >= setsNum) {
       setShowActionSheet(true);
     }
   }, [misses, level]);
 
   React.useEffect(() => {
-    setGame(props.players)
-  }, [props.players]);
+    setGame(players)
+  }, [players]);
 
   const gameSection = !!Object.keys(game).length && (
     <IonCard>
@@ -117,97 +113,23 @@ const Game: React.FC<GameProps> = (props) => {
       <IonList inset={true} lines={"full"}>
         {Object.values(game)
           .sort((a, b) => _sortPlayers(a, b))
-          .map((player:any, index) => (
-            <IonItem key={index}>
-              <IonLabel>
-                <IonNote style={{ marginRight: "0.5rem" }}>
-                  {index + 1}
-                </IonNote>
-                {player.name}
-              </IonLabel>
-              <IonNote slot="end">
-                {!!player.hits && player.hits.map((hit:any, i:number) => (
-                  <IonBadge key={i} color="primary" style={{ marginLeft: "0.5rem" }}>
-                    {hit}
-                  </IonBadge>
-                ))}
-              </IonNote>
-            </IonItem>
+          .map((player: any, index) => (
+            <Player key={index} index={index} player={player} />
           ))}
       </IonList>
     </IonCard>
   );
 
-  const levelsSection = (
-    <IonGrid className="ion-padding">
-      <IonRow>
-        <IonCol className="ion-text-center">
-          <IonTitle>{sets[level]} misses allowed</IonTitle>
-        </IonCol>
-      </IonRow>
-      <IonRow>
-        <IonCol className="ion-text-center">
-          <IonButton color="warning" onClick={() => setLevel(level + 1)}>
-            Level up ({level + 1})
-          </IonButton>
-        </IonCol>
-      </IonRow>
-      <IonRow>
-        <IonCol className="ion-text-center">
-          <IonButton color="success" onClick={() => _handleFinishGame()}>
-            Finish game
-          </IonButton>
-        </IonCol>
-      </IonRow>
-    </IonGrid>
-  );
-
-  const controlsSection = (
-    <IonGrid>
-      <IonRow>
-        <IonCol style={{ textAlign: "center" }}>
-          <IonText>{misses}</IonText>
-          <IonButton
-            color="danger"
-            expand="block"
-            onClick={() => setMisses(misses + 1)}
-          >
-            Miss
-          </IonButton>
-        </IonCol>
-        <IonCol style={{ textAlign: "center" }}>
-          <IonText>{hits}</IonText>
-          <IonButton
-            color="success"
-            expand="block"
-            onClick={() => setHits(hits + 1)}
-          >
-            Hit
-          </IonButton>
-        </IonCol>
-      </IonRow>
-    </IonGrid>
-  );
-
   return (
     <>
-      <IonHeader>
-        <IonToolbar color="dark">
-          <IonTitle>Game</IonTitle>
-          <IonButtons slot="end">
-            <IonButton onClick={() => props.onDismiss()}>
-              <IonIcon slot="icon-only" icon={closeCircleOutline} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <GameHeader onDismiss={onDismiss} />
       <IonContent scrollEvents={true}>
         {gameSection}
-        {levelsSection}
+        <Levels sets={sets} level={level} onFinishGame={_handleFinishGame} onSetLevel={setLevel} />
       </IonContent>
       <IonFooter>
         <IonToolbar>
-          {controlsSection}
+          <Controls hits={hits} misses={misses} onSetHits={setHits} onSetMisses={setMisses} />
         </IonToolbar>
       </IonFooter>
       <IonActionSheet
@@ -215,7 +137,7 @@ const Game: React.FC<GameProps> = (props) => {
         header="Choose a player"
         backdropDismiss={false}
         onDidDismiss={() => setShowActionSheet(false)}
-        buttons={Object.values(props.players).map((player:any) => {
+        buttons={Object.values(players).map((player: any) => {
           return {
             text: player.name,
             handler: () => _handleScore(player.name)
