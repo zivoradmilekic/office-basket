@@ -1,33 +1,20 @@
 import React from 'react';
 
 import Game from '../modals/Game';
-
-import { addCircleOutline, flame } from "ionicons/icons";
+import Header from "../components/Header";
+import ListHeader from "../components/ListHeader";
+import Player from "../components/Player";
+import StartGame from "../components/StartGame";
 
 import useLocalStorage from '../hooks/useLocalStorage';
 
 import {
   IonContent,
-  IonHeader,
   IonPage,
-  IonTitle,
-  IonToolbar,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonButton,
-  IonText,
   IonCard,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
   IonList,
   IonItem,
   IonLabel,
-  IonNote,
-  IonBadge,
-  IonButtons,
-  IonIcon,
   IonModal
 } from '@ionic/react';
 
@@ -36,10 +23,10 @@ const Home: React.FC = () => {
   const [showModal, setShowModal] = React.useState(false);
 
   const _handleAddPlayer = () => {
-    const name:any = prompt(`Enter player name`);
+    const name: any = prompt(`Enter player name`);
     if (!name || name.length === 0) return false;
 
-    let newPlayers:any = {
+    let newPlayers: any = {
       ...players
     };
 
@@ -56,7 +43,7 @@ const Home: React.FC = () => {
     setPlayers(newPlayers);
   }
 
-  const _sortPlayers = (curr:any, prev:any) => {
+  const _sortPlayers = (curr: any, prev: any) => {
     let currScore = curr.score;
     let prevScore = prev.score;
 
@@ -71,81 +58,31 @@ const Home: React.FC = () => {
 
   const playersSection = (
     <IonCard>
-      <IonCardHeader>
-        <IonToolbar>
-          <IonCardSubtitle>Players</IonCardSubtitle>
-          <IonCardTitle>Scoreboard</IonCardTitle>
-          <IonButtons slot="end">
-            <IonButton onClick={() => _handleAddPlayer()}>
-              <IonIcon slot="icon-only" icon={addCircleOutline} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonCardHeader>
+      <ListHeader onAddPlayer={_handleAddPlayer} />
       <IonList inset={true} lines={"full"}>
         {Object.values(players)
           .sort((a, b) => _sortPlayers(a, b))
-          .map((player:any, index) => (
-            <IonItem key={index}>
-              <IonLabel>
-                <IonNote style={{ marginRight: "0.5rem" }}>
-                  {index + 1}
-                </IonNote>
-                {player.name}
-              </IonLabel>
-              <IonNote slot="end">
-                {!!player.score && (
-                  <IonBadge color="primary" style={{ marginLeft: "0.5rem" }}>
-                    {player.score}
-                  </IonBadge>
-                )}
-              </IonNote>
-            </IonItem>
+          .map((player: any, index) => (
+            <Player key={index} index={index} player={player} />
           ))}
-          {
-            !Object.keys(players).length && (
-              <IonItem>
-                <IonLabel>
-                  No players
-                </IonLabel>
-              </IonItem>
-            )
-          }
+        {
+          !Object.keys(players).length && (
+            <IonItem>
+              <IonLabel>
+                No players
+              </IonLabel>
+            </IonItem>
+          )
+        }
       </IonList>
     </IonCard>
   );
 
-  const playButtonSection = !!Object.keys(players).length && (
-    <IonGrid className="ion-padding">
-      <IonRow>
-        <IonCol className="ion-text-center">
-          <IonText>
-            Have a fun! Take a break of your hard work!
-          </IonText>
-        </IonCol>
-      </IonRow>
-      <IonRow>
-        <IonCol className="ion-text-center">
-          <IonButton onClick={() => setShowModal(true)}>
-            Play new game
-          </IonButton>
-        </IonCol>
-      </IonRow>
-    </IonGrid>
-  )
+  const playButtonSection = !!Object.keys(players).length && <StartGame onShowModal={setShowModal} />
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar color="dark">
-          <IonTitle>Office Basket</IonTitle>
-          <IonButtons slot="end">
-            <IonButton onClick={() => setPlayers({})}>
-              <IonIcon slot="icon-only" icon={flame} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <Header onSetPlayers={setPlayers} />
       <IonContent>
         {playersSection}
         {playButtonSection}
@@ -155,10 +92,9 @@ const Home: React.FC = () => {
         >
           <Game
             players={players}
-            onFinish={(p:any) => _handleFinishGame(p)}
+            onFinish={(p: any) => _handleFinishGame(p)}
             onDismiss={() => setShowModal(false)}
-          >
-          </Game>
+          />
         </IonModal>
       </IonContent>
     </IonPage>
